@@ -11,7 +11,13 @@ echo.
 echo  Instalando el asistente de Claude (opcional)...
 py -3 -m pip install --upgrade anthropic
 echo.
-echo  Listo. CIERRA esta ventana y abre "Abrir Basetoque.bat".
-echo  (Si dice que falta FFmpeg, reinicia la computadora una vez.)
+echo  Creando el acceso directo en el Escritorio...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$d=[Environment]::GetFolderPath('Desktop'); $s=(New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path $d 'Basetoque Studio.lnk')); $s.TargetPath='%~dp0Abrir Basetoque.bat'; $s.WorkingDirectory='%~dp0'; $s.IconLocation='%SystemRoot%\System32\shell32.dll,115'; $s.Save()"
+echo.
+echo  ===========================================================
+echo   LISTO. Reinicia la computadora una vez y despues abre
+echo   "Basetoque Studio" desde tu Escritorio.
+echo   (No borres ni muevas esta carpeta: el acceso directo la usa.)
+echo  ===========================================================
 echo.
 pause

@@ -7,11 +7,12 @@ Basetoque Studio es tu programa para editar **videos** y diseñar **flyers**. Fu
 
 ## Paso 1 — Descargar el programa
 
-1. Entra a **https://github.com/gmeiniguez-ctrl/Basetoque**
-2. Toca el botón verde **`<> Code`** → **Download ZIP**.
-3. Busca el ZIP en tu carpeta de Descargas y **descomprímelo** (doble clic en Mac;
+1. Descarga **Basetoque.zip** (te lo paso Claude en el chat, o desde
+   **https://github.com/gmeiniguez-ctrl/Basetoque** → botón verde **`<> Code`** → **Download ZIP**).
+2. Busca el ZIP en tu carpeta de Descargas y **descomprímelo** (doble clic en Mac;
    en Windows: clic derecho → *Extraer todo*).
-4. Mueve la carpeta **Basetoque** a un lugar cómodo, por ejemplo *Documentos*.
+3. Mueve la carpeta **Basetoque** a **Documentos** y no la muevas más
+   (el acceso directo del escritorio la usa).
 
 ## Paso 2 — Instalar lo necesario (una sola vez)
 
@@ -24,6 +25,8 @@ Hay un instalador automático:
 3. Si Windows pregunta "¿Permitir cambios?", toca **Sí**. Espera a que termine.
 4. **Reinicia la computadora** (sólo esta primera vez).
 
+Al terminar aparece **Basetoque Studio** en tu Escritorio.
+
 > Si Windows muestra "Windows protegió su PC": toca **Más información → Ejecutar de todas formas**.
 
 ### En Mac
@@ -32,17 +35,17 @@ Hay un instalador automático:
 3. Si pide la contraseña de tu Mac, escríbela (no se ve mientras escribes) y Enter.
    Espera a que diga **¡Listo!** (puede tardar 10–15 minutos la primera vez).
 
+Al terminar aparece **Basetoque Studio** en tu Escritorio.
+
 ## Paso 3 — Abrir Basetoque Studio
 
-- **Windows:** doble clic en **`Abrir Basetoque.bat`**
-- **Mac:** doble clic en **`Abrir Basetoque.command`** (la primera vez: clic derecho → Abrir)
+Doble clic en **Basetoque Studio** en tu Escritorio.
+(También puedes usar `Abrir Basetoque` dentro de la carpeta.)
 
 Se abre una ventana negra (**déjala abierta** mientras usas el programa) y tu navegador
 muestra Basetoque Studio. Si el navegador no se abre solo, entra a **http://127.0.0.1:8765**.
 
 Para cerrar el programa, cierra la ventana negra.
-
-> 💡 Consejo: crea un acceso directo de `Abrir Basetoque` en tu escritorio.
 
 ---
 
