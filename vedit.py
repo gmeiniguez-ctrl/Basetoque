@@ -95,6 +95,11 @@ def fmt_time(secs: float) -> str:
     return f"{int(h):02d}:{int(m):02d}:{s:06.3f}"
 
 
+def ffpath(path) -> str:
+    """Escapa una ruta para usarla dentro de un filtro de FFmpeg (p.ej. C:\\x en Windows)."""
+    return str(path).replace("\\", "/").replace(":", "\\:").replace("'", "'\\\\\\''")
+
+
 def even(n: float) -> int:
     n = int(round(n))
     return n if n % 2 == 0 else n + 1
@@ -263,13 +268,13 @@ def drawtext_filter(spec: dict, tmp: TempDir, expand: bool = False) -> str:
     color = spec.get("color", "white")
     x, y = position_xy(spec.get("position", "center"), "text")
     font = spec.get("font")
-    opts = [f"textfile='{path}'", f"expansion={'normal' if expand else 'none'}"]
+    opts = [f"textfile='{ffpath(path)}'", f"expansion={'normal' if expand else 'none'}"]
     if font and os.path.exists(font):
-        opts.append(f"fontfile='{font}'")
+        opts.append(f"fontfile='{ffpath(font)}'")
     elif font:
         opts.append(f"font='{font}'")
     elif default_font():
-        opts.append(f"fontfile='{default_font()}'")
+        opts.append(f"fontfile='{ffpath(default_font())}'")
     opts += [f"fontsize={size}", f"fontcolor={color}", f"x={x}", f"y={y}", "line_spacing=10"]
     outline = spec.get("outline", 3)
     if outline:
@@ -323,7 +328,7 @@ def color_filters(spec, tmp: TempDir) -> list[str]:
     if spec.get("vignette"):
         filters.append("vignette=PI/5")
     if spec.get("lut"):
-        filters.append(f"lut3d=file='{tmp.copy(spec['lut'])}'")
+        filters.append(f"lut3d=file='{ffpath(tmp.copy(spec['lut']))}'")
     return filters
 
 
@@ -375,7 +380,7 @@ def post_process(src: str, output: str, opts: dict, crf: int | None = None) -> N
             style = opts.get("subtitle_style")
             if style is None:
                 style = "FontName=DejaVu Sans,FontSize=18,Bold=1,Outline=2,Shadow=0,MarginV=30"
-            vf.append(f"subtitles='{sub}'" + (f":force_style='{style}'" if style else ""))
+            vf.append(f"subtitles='{ffpath(sub)}'" + (f":force_style='{style}'" if style else ""))
         fi, fo = float(opts.get("fade_in") or 0), float(opts.get("fade_out") or 0)
         if fi > 0:
             vf.append(f"fade=t=in:st=0:d={fi}")
@@ -897,8 +902,8 @@ def cmd_stabilize(a):
     with TempDir() as tmp:
         trf = str(tmp.path / "transforms.trf")
         ffmpeg(["-i", a.input, "-vf", f"vidstabdetect=shakiness={a.shakiness}:accuracy=15:"
-                f"result='{trf}'", "-f", "null", "-"])
-        ffmpeg(["-i", a.input, "-vf", f"vidstabtransform=input='{trf}':smoothing={a.smoothing}:"
+                f"result='{ffpath(trf)}'", "-f", "null", "-"])
+        ffmpeg(["-i", a.input, "-vf", f"vidstabtransform=input='{ffpath(trf)}':smoothing={a.smoothing}:"
                 "zoom=0:optzoom=1,unsharp=5:5:0.8:3:3:0.4"]
                + out_codecs(a.output, audio=info["has_audio"]) + [a.output])
 

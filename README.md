@@ -1,11 +1,34 @@
 # Basetoque
 
-Editor de video por línea de comandos sobre **FFmpeg** — y un espacio de trabajo donde
-Claude actúa como tu editor (ver [`CLAUDE.md`](CLAUDE.md)).
+Tu estudio para crear **videos** y **flyers** en tu propia computadora, sin internet,
+con Claude como editor cuando lo necesites.
 
-**Requisitos:** Python 3.9+ y `ffmpeg`/`ffprobe` en el PATH. Nada más.
+- **Basetoque Studio** — programa con ventanas para subir material, hacer ediciones
+  rápidas, armar videos con títulos/transiciones/música y diseñar flyers con plantillas.
+  👉 **Cómo instalarlo: [`INSTALAR.md`](INSTALAR.md)**
+- **`vedit.py`** — el motor de edición (línea de comandos sobre FFmpeg) que usan la app
+  y Claude.
+- **Claude** — ábreme con Claude Code en esta carpeta y te edito los videos; lo que hago
+  aparece en Basetoque Studio (ver [`CLAUDE.md`](CLAUDE.md)).
 
-## Cómo trabajar con Claude
+**Requisitos:** Python 3.9+ y `ffmpeg`/`ffprobe`. Opcional: `pip install anthropic` para
+el asistente dentro de la app.
+
+## Basetoque Studio
+
+| Pestaña | Qué hace |
+|---|---|
+| Mis archivos | Arrastra videos, fotos, música y logos. Vista previa y descarga de resultados. |
+| Edición rápida | 17 acciones de un clic: vertical, recortar, quitar silencios, texto, música, color, logo, subtítulos, limpiar voz, velocidad, estabilizar, fundidos, comprimir, GIF, portada… |
+| Crear video | Línea de tiempo: clips (con marcado de inicio/fin), fotos con zoom, tarjetas de título, transiciones, música, color, logo, subtítulos. Guarda y abre proyectos. |
+| Flyers | Editor visual con plantillas, textos, formas e imágenes; tamaños para post, historia, Facebook, A4. Exporta PNG y lo anima como video para historias. |
+| ✨ Claude | Chat para pedir videos o flyers (con clave de API) e instrucciones para usar Claude Code. |
+
+Abrir: `Abrir Basetoque.bat` (Windows), `Abrir Basetoque.command` (Mac) o
+`python3 app/server.py`. Formatos de proyecto: [`docs/timeline.md`](docs/timeline.md) y
+[`docs/flyer.md`](docs/flyer.md).
+
+## Cómo trabajar con Claude (Claude Code)
 
 1. Sube tus clips, fotos y música a `media/` (ignorado por git).
 2. Pide lo que quieras en lenguaje natural, p.ej.:

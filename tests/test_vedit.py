@@ -69,6 +69,16 @@ class VEditTest(unittest.TestCase):
         self.assertEqual(vedit.parse_time(12), 12)
         self.assertIsNone(vedit.parse_time(None))
 
+    def test_rutas_raras_en_filtros(self):
+        # Rutas con ":" (como C:\ en Windows) y apóstrofes deben funcionar en filtros.
+        raro = self.d / "disco:C" / "it's"
+        raro.mkdir(parents=True)
+        shutil.copy(self.p("subs.srt"), raro / "subs.srt")
+        out = self.p("subs_raro.mp4")
+        self.run_cli("subtitles", self.p("a.mp4"), out, raro / "subs.srt")
+        self.assertDuration(out, 3)
+        self.assertEqual(vedit.ffpath(r"C:\Users\Ana\a.srt"), "C\\:/Users/Ana/a.srt")
+
     def test_atempo_chain(self):
         self.assertEqual(len(vedit.atempo_chain(8)), 3)
         self.assertEqual(len(vedit.atempo_chain(0.2)), 3)

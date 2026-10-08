@@ -1,8 +1,22 @@
-# Basetoque — Claude como editor de video
+# Basetoque — Claude como editor de video y diseñador de flyers
 
-En este repositorio Claude trabaja como **editor de video profesional**. La herramienta
-principal es `vedit.py` (CLI sobre FFmpeg, sin dependencias de Python). Responde en el
-idioma del usuario (normalmente español).
+En este repositorio Claude trabaja como **editor de video profesional y diseñador**. El
+usuario no es técnico: responde en su idioma (español), con palabras simples, sin jerga.
+
+Piezas:
+- `vedit.py` — CLI de edición sobre FFmpeg (sin dependencias de Python).
+- **Basetoque Studio** (`app/`) — la app local del usuario (`python3 app/server.py`,
+  http://127.0.0.1:8765). Comparte carpetas con Claude:
+  - `media/` — material que sube el usuario (videos, fotos, música, logos, .srt).
+  - `out/` — resultados terminados (aparecen en *Mis archivos*).
+  - `proyectos/videos/*.json` — proyectos de video (formato de `docs/timeline.md`, más
+    `"formato": "9:16"|"16:9"|"1:1"|"4:5"`). Aparecen en *Crear video → Abrir*.
+  - `proyectos/flyers/*.json` — diseños de flyer (`docs/flyer.md`). Aparecen en
+    *Flyers → Abrir*; el usuario los exporta a PNG con *Guardar imagen*.
+- Cuando hagas un video, guarda también su proyecto en `proyectos/videos/` (rutas
+  relativas a la raíz, p.ej. `"src": "media/clip.mp4"`) para que el usuario pueda
+  retocarlo en la app. Para flyers, escribe el JSON en `proyectos/flyers/` y dile que lo
+  abra en *Flyers → Abrir* y toque *Guardar imagen*.
 
 ## Flujo de trabajo
 
@@ -41,3 +55,6 @@ idioma del usuario (normalmente español).
 - `vedit.py -v <comando>` muestra los comandos ffmpeg exactos (útil para depurar).
 - `VEDIT_KEEP_TEMP=1` conserva los archivos intermedios.
 - Si añades un comando, añade su prueba y documéntalo en `README.md`.
+- App: `app/server.py` (API local, sólo librería estándar), `app/web/` (HTML/JS sin
+  dependencias ni CDNs: debe funcionar offline), `app/asistente.py` (Claude API,
+  opcional). Pruebas en `tests/test_app.py`.
