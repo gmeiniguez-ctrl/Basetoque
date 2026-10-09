@@ -241,7 +241,7 @@ const HERRAMIENTAS = [
   { id: "recortar", icono: "✂️", titulo: "Recortar", desc: "Quedarte con una parte", campos: [
     { k: "inicio", l: "Desde (ej. 0:05)", t: "text", d: "0" }, { k: "fin", l: "Hasta (ej. 0:20)", t: "text" }] },
   { id: "sin_silencios", icono: "🤐", titulo: "Quitar silencios", desc: "Ideal para entrevistas y charlas", campos: [
-    { k: "umbral", l: "Sensibilidad", t: "select", o: [["-32", "Normal"], ["-40", "Suave (corta menos)"], ["-26", "Fuerte (corta más)"]] }] },
+    { k: "umbral", l: "Sensibilidad", t: "select", o: [["auto", "Automática (recomendada)"], ["-40", "Suave (corta menos)"], ["-26", "Fuerte (corta más)"]] }] },
   { id: "texto", icono: "🔤", titulo: "Agregar texto", desc: "Título o frase sobre el video", campos: [
     { k: "texto", l: "Texto", t: "text", d: "¡Hola!" },
     { k: "posicion", l: "Dónde", t: "select", o: [["top", "Arriba"], ["center", "Centro"], ["bottom", "Abajo"], ["lower-third", "Tercio inferior"]] },

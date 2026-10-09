@@ -257,7 +257,8 @@ HERRAMIENTAS = {
     "recortar": ("recorte", None, _herr_recortar),
     "vertical": ("vertical", None, _herr_vertical),
     "sin_silencios": ("sin_silencios", None, lambda e, s, o: [
-        "silence-cut", e, s, "--noise", str(o.get("umbral", -32))]),
+        "silence-cut", e, s] + ([] if o.get("umbral", "auto") == "auto"
+                                else ["--noise", str(o["umbral"])])),
     "texto": ("texto", None, _herr_texto),
     "color": ("color", None, lambda e, s, o: ["color", e, s, "--preset",
                                                o.get("preset", "cinematic")]),

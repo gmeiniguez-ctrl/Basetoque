@@ -241,9 +241,9 @@ def position_xy(position: str, kind: str = "text", margin: float = 0.05) -> tupl
     else:
         W, H, w, h = "main_w", "main_h", "overlay_w", "overlay_h"
     position = (position or "center").lower()
-    m = re.fullmatch(r"\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*", position)
-    if m:
-        return m.group(1), m.group(2)
+    m = re.fullmatch(r"\s*(center|-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*", position)
+    if m:  # "x,y" en píxeles; x puede ser "center" para centrar horizontalmente
+        return (f"({W}-{w})/2" if m.group(1) == "center" else m.group(1)), m.group(2)
     mx, my = f"{W}*{margin}", f"{H}*{margin}"
     cx, cy = f"({W}-{w})/2", f"({H}-{h})/2"
     left, right = mx, f"{W}-{w}-{mx}"
@@ -518,6 +518,9 @@ def render_segment(clip: dict, out: str, W: int, H: int, fps: float, tmp: TempDi
             vpre.append("reverse")
         if speed != 1.0:
             vpre.append(f"setpts=PTS/{speed}")
+        zoom = float(clip.get("zoom") or 1.0)
+        if zoom > 1.0:  # acercamiento, centrado un poco arriba (donde suele estar la cara)
+            vpre.append(f"crop=trunc(iw/{zoom}/2)*2:trunc(ih/{zoom}/2)*2:(iw-ow)/2:(ih-oh)*0.4")
         graph.append(f"[0:v]{','.join(vpre) if vpre else 'null'}[pre]")
         graph.append(fit_graph("pre", "fit", W, H, fit))
 
@@ -597,7 +600,13 @@ def render_timeline(tl: dict, output: str | None = None, base_dir: str | None = 
         if p is None:
             return None
         pp = Path(p).expanduser()
-        return str(pp if pp.is_absolute() else base / pp)
+        if pp.is_absolute():
+            return str(pp)
+        # Relativa al JSON; si no existe ahí, a la carpeta actual o a la del proyecto Basetoque
+        for raiz in (base, Path.cwd(), Path(__file__).resolve().parent):
+            if (raiz / pp).exists():
+                return str(raiz / pp)
+        return str(base / pp)
 
     clips = [dict(c) for c in tl.get("clips", [])]
     if not clips:
@@ -841,11 +850,50 @@ def detect_silences(path: str, noise_db: float, min_dur: float) -> list[tuple[fl
     return list(zip(starts, ends))
 
 
+def detect_pauses(path: str, min_dur: float, margin_db: float = 4.0,
+                  window: float = 0.1) -> list[tuple[float, float]]:
+    """Detecta pausas comparando el volumen medio (RMS) con el ruido de fondo del propio video.
+
+    Funciona aunque haya ruido constante (auto, viento, ventilador), donde silencedetect falla.
+    """
+    rate = 16000
+    n = int(rate * window)
+    log_text = ffmpeg(["-i", path, "-vn", "-af",
+                       f"aresample={rate},pan=mono|c0=c0,highpass=f=150,lowpass=f=4000,"
+                       f"asetnsamples=n={n}:p=0,astats=metadata=1:reset=1,"
+                       "ametadata=print:key=lavfi.astats.Overall.RMS_level",
+                       "-f", "null", "-"], capture_log=True)
+    niveles = []
+    for m in re.finditer(r"RMS_level=(-?[\d.]+|-inf)", log_text):
+        v = m.group(1)
+        niveles.append(-120.0 if v == "-inf" else float(v))
+    if not niveles:
+        return []
+    ordenados = sorted(niveles)
+    piso = ordenados[int(len(ordenados) * 0.1)]
+    techo = ordenados[int(len(ordenados) * 0.9)]
+    if techo - piso < 6:  # casi no hay diferencia entre voz y fondo: no cortar nada
+        return []
+    umbral = piso + max(margin_db, (techo - piso) * 0.25)
+    pausas, inicio = [], None
+    for i, v in enumerate(niveles + [0.0]):
+        if v < umbral and inicio is None:
+            inicio = i
+        elif v >= umbral and inicio is not None:
+            if (i - inicio) * window >= min_dur:
+                pausas.append((inicio * window, i * window))
+            inicio = None
+    return pausas
+
+
 def cmd_silence_cut(a):
     info = probe(a.input)
     if not info["has_audio"]:
         raise VEditError("El video no tiene audio; no hay silencios que detectar.")
-    silences = detect_silences(a.input, a.noise, a.min_silence)
+    if a.noise is None:
+        silences = detect_pauses(a.input, a.min_silence)
+    else:
+        silences = detect_silences(a.input, a.noise, a.min_silence)
     keep, cursor = [], 0.0
     for s, e in silences:
         s_cut, e_cut = s + a.padding, e - a.padding
@@ -1157,7 +1205,8 @@ def build_parser() -> argparse.ArgumentParser:
     add("extract-audio", cmd_extract_audio, "Extrae el audio (mp3, wav, m4a, flac…)")
 
     sp = add("silence-cut", cmd_silence_cut, "Elimina automáticamente los silencios (jump cuts)")
-    sp.add_argument("--noise", type=float, default=-32, help="umbral en dB (def -32)")
+    sp.add_argument("--noise", type=float, default=None,
+                    help="umbral fijo en dB (por defecto se calcula solo según el ruido de fondo)")
     sp.add_argument("--min-silence", type=float, default=0.6, help="silencio mínimo a cortar (s)")
     sp.add_argument("--padding", type=float, default=0.12, help="margen que se deja (s)")
 

@@ -24,6 +24,7 @@ segundos (`12.5`) o `mm:ss` / `hh:mm:ss.ms`.
     {"src": "media/playa.mp4", "start": "0:12", "end": "0:18",
      "speed": 1.0,                    // 2 = doble, 0.5 = cámara lenta
      "volume": 0.8, "mute": false, "reverse": false,
+     "zoom": 1.15,                    // acercamiento (útil para alternar planos en jump cuts)
      "fit": "crop",                   // sobrescribe el global
      "color_grade": "warm",           // preset o {"preset":..,"contrast":..,"saturation":..}
      "text": [{"text": "Día 1", "position": "lower-third", "start": 0.5, "end": 3}],

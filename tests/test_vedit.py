@@ -163,6 +163,19 @@ class VEditTest(unittest.TestCase):
         self.assertLess(info["duration"], 3.0)
         self.assertGreater(info["duration"], 1.8)
 
+    def test_pausas_con_ruido_de_fondo(self):
+        # Voz con ruido constante (como en un auto): silencedetect no ve pausas, detect_pauses sí.
+        ruido = self.p("ruido.mp4")
+        gen(["-f", "lavfi", "-i", "testsrc2=s=320x240:r=30:d=6",
+             "-f", "lavfi", "-i", "anoisesrc=c=brown:a=0.03:d=6",
+             "-f", "lavfi", "-i", "aevalsrc='if(between(t,2,4),0,0.4*sin(2*PI*300*t))':s=48000:d=6",
+             "-filter_complex", "[1:a][2:a]amix=inputs=2:normalize=0[a]", "-map", "0:v", "-map", "[a]",
+             "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", str(ruido)])
+        pausas = vedit.detect_pauses(str(ruido), 0.6)
+        self.assertEqual(len(pausas), 1, pausas)
+        self.assertAlmostEqual(pausas[0][0], 2, delta=0.3)
+        self.assertAlmostEqual(pausas[0][1], 4, delta=0.3)
+
     def test_scenes(self):
         out = self.p("concat_cut_scenes.mp4")
         self.run_cli("concat", self.p("a.mp4"), self.p("b.mp4"), "-o", out)
