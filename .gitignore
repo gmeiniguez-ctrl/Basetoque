@@ -1,0 +1,8 @@
+media/
+out/
+__pycache__/
+*.pyc
+*.trf
+config.local.json
+.cache/
+proyectos/

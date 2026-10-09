@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basetoque Studio</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+<link rel="stylesheet" href="/web/app.css">
+</head>
+<body>
+<header class="barra">
+  <div class="marca">🎬 <b>Basetoque</b> Studio</div>
+  <nav id="pestanas">
+    <button data-tab="inicio" class="activa">Inicio</button>
+    <button data-tab="archivos">Mis archivos</button>
+    <button data-tab="rapido">Edición rápida</button>
+    <button data-tab="editor">Crear video</button>
+    <button data-tab="flyers">Flyers</button>
+    <button data-tab="asistente">✨ Claude</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ================= INICIO ================= -->
+  <section id="tab-inicio" class="tab activa">
+    <div class="hola">
+      <h1>¿Qué vamos a crear hoy?</h1>
+      <p class="sutil">Todo se hace en tu computadora. Tus archivos no salen de aquí.</p>
+      <div id="aviso-ffmpeg" class="aviso oculto">⚠️ Falta instalar FFmpeg, el motor de video. Sigue el paso 2 de <b>INSTALAR.md</b> y vuelve a abrir la app.</div>
+    </div>
+    <div class="tarjetas-inicio">
+      <button class="tarjeta-grande" data-ir="archivos"><span>📥</span><b>Subir archivos</b><small>Videos, fotos, música, logos</small></button>
+      <button class="tarjeta-grande" data-ir="rapido"><span>⚡</span><b>Edición rápida</b><small>Recortar, vertical, quitar silencios, música…</small></button>
+      <button class="tarjeta-grande" data-ir="editor"><span>🎞️</span><b>Crear un video</b><small>Une clips, títulos, transiciones y música</small></button>
+      <button class="tarjeta-grande" data-ir="flyers"><span>🖼️</span><b>Diseñar un flyer</b><small>Plantillas para Instagram, historias y más</small></button>
+      <button class="tarjeta-grande destacada" data-ir="asistente"><span>✨</span><b>Pedírselo a Claude</b><small>Describe lo que quieres y Claude lo arma</small></button>
+    </div>
+    <h2>Últimos resultados</h2>
+    <div id="inicio-resultados" class="grilla"></div>
+  </section>
+
+  <!-- ================= ARCHIVOS ================= -->
+  <section id="tab-archivos" class="tab">
+    <label id="zona-subida" class="zona-subida">
+      <input type="file" id="input-subida" multiple hidden>
+      <span class="grande">📥</span>
+      <b>Arrastra tus archivos aquí</b>
+      <span class="sutil">o haz clic para elegirlos (videos, fotos, música, logos, subtítulos .srt)</span>
+    </label>
+    <div id="progreso-subida"></div>
+    <h2>Mi material <small class="sutil">(carpeta media)</small></h2>
+    <div id="lista-media" class="grilla"></div>
+    <h2>Mis resultados <small class="sutil">(carpeta out)</small></h2>
+    <div id="lista-out" class="grilla"></div>
+  </section>
+
+  <!-- ================= EDICIÓN RÁPIDA ================= -->
+  <section id="tab-rapido" class="tab">
+    <div class="paso">
+      <h2>1. Elige el archivo</h2>
+      <select id="rapido-archivo" class="ancho"></select>
+    </div>
+    <div class="paso">
+      <h2>2. ¿Qué quieres hacer?</h2>
+      <div id="rapido-herramientas" class="herramientas"></div>
+    </div>
+    <div class="paso oculto" id="rapido-opciones-caja">
+      <h2>3. Ajustes</h2>
+      <div id="rapido-opciones" class="formulario"></div>
+      <button id="rapido-ejecutar" class="boton primario grande">▶ Hacerlo</button>
+    </div>
+  </section>
+
+  <!-- ================= EDITOR DE VIDEO ================= -->
+  <section id="tab-editor" class="tab">
+    <div class="editor-barra">
+      <input id="ed-nombre" class="nombre-proyecto" value="mi_video" title="Nombre del video">
+      <select id="ed-formato" title="Formato">
+        <option value="9:16">📱 Vertical 9:16 (Reels, TikTok, Shorts)</option>
+        <option value="16:9">🖥️ Horizontal 16:9 (YouTube)</option>
+        <option value="1:1">⬛ Cuadrado 1:1</option>
+        <option value="4:5">▯ Post 4:5 (Instagram)</option>
+      </select>
+      <span class="espacio"></span>
+      <button id="ed-abrir" class="boton">📂 Abrir</button>
+      <button id="ed-guardar" class="boton">💾 Guardar</button>
+      <button id="ed-nuevo" class="boton">🗒️ Nuevo</button>
+      <button id="ed-render" class="boton primario">🎬 Crear video</button>
+    </div>
+    <div class="editor">
+      <aside class="panel">
+        <h3>Material</h3>
+        <p class="sutil">Toca un archivo para agregarlo al video.</p>
+        <div id="ed-biblioteca" class="biblioteca"></div>
+        <button id="ed-tarjeta" class="boton ancho">➕ Tarjeta de título</button>
+      </aside>
+      <div class="centro">
+        <div class="visor">
+          <video id="ed-visor" controls playsinline></video>
+          <img id="ed-visor-img" class="oculto" alt="">
+          <div id="ed-visor-vacio" class="visor-vacio">Agrega clips desde la izquierda ←</div>
+        </div>
+        <div id="ed-marcas" class="marcas oculto">
+          <button id="ed-marcar-inicio" class="boton">⏮ Marcar inicio aquí</button>
+          <span id="ed-rango" class="sutil"></span>
+          <button id="ed-marcar-fin" class="boton">Marcar fin aquí ⏭</button>
+        </div>
+        <h3>Línea de tiempo <small id="ed-duracion" class="sutil"></small></h3>
+        <div id="ed-clips" class="clips"></div>
+      </div>
+      <aside class="panel">
+        <h3>Acabado</h3>
+        <div class="formulario">
+          <label>Música de fondo <select id="ed-musica"></select></label>
+          <label>Volumen música <input id="ed-volumen" type="range" min="0.05" max="1" step="0.05" value="0.25"></label>
+          <label>Estilo de color <select id="ed-color"></select></label>
+          <label>Logo <select id="ed-logo"></select></label>
+          <label>Posición del logo
+            <select id="ed-logo-pos">
+              <option value="top-right">Arriba derecha</option><option value="top-left">Arriba izquierda</option>
+              <option value="bottom-right">Abajo derecha</option><option value="bottom-left">Abajo izquierda</option>
+            </select></label>
+          <label>Subtítulos (.srt) <select id="ed-subs"></select></label>
+          <label>Texto fijo (ej. @tucuenta) <input id="ed-firma" placeholder="opcional"></label>
+          <label class="check"><input type="checkbox" id="ed-fundidos" checked> Fundido al inicio y al final</label>
+          <label class="check"><input type="checkbox" id="ed-normalizar" checked> Volumen parejo para redes</label>
+          <label>Transición entre clips <select id="ed-transicion"></select></label>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ================= FLYERS ================= -->
+  <section id="tab-flyers" class="tab">
+    <div class="editor-barra">
+      <input id="fl-nombre" class="nombre-proyecto" value="mi_flyer" title="Nombre del flyer">
+      <select id="fl-tamano" title="Tamaño"></select>
+      <span class="espacio"></span>
+      <button id="fl-plantillas" class="boton">🎨 Plantillas</button>
+      <button id="fl-abrir" class="boton">📂 Abrir</button>
+      <button id="fl-exportar" class="boton primario">💾 Guardar imagen</button>
+    </div>
+    <div class="editor">
+      <aside class="panel">
+        <h3>Agregar</h3>
+        <div class="botones-col">
+          <button class="boton" id="fl-add-titulo">🔠 Título</button>
+          <button class="boton" id="fl-add-texto">📝 Texto</button>
+          <button class="boton" id="fl-add-rect">▭ Rectángulo</button>
+          <button class="boton" id="fl-add-circulo">◯ Círculo</button>
+        </div>
+        <h3>Imágenes</h3>
+        <p class="sutil">Toca una imagen para agregarla.</p>
+        <div id="fl-imagenes" class="biblioteca"></div>
+        <h3>Fondo</h3>
+        <div class="formulario" id="fl-fondo"></div>
+      </aside>
+      <div class="centro">
+        <div class="lienzo-caja" id="fl-caja"><canvas id="fl-lienzo"></canvas></div>
+        <p class="sutil centrado">Arrastra para mover · esquina inferior derecha para cambiar el tamaño · Supr para borrar</p>
+      </div>
+      <aside class="panel">
+        <h3>Elemento seleccionado</h3>
+        <div id="fl-props" class="formulario"><p class="sutil">Toca algo en el flyer para editarlo.</p></div>
+        <div id="fl-capas" class="botones-fila oculto">
+          <button class="boton" id="fl-subir" title="Traer adelante">⬆️</button>
+          <button class="boton" id="fl-bajar" title="Enviar atrás">⬇️</button>
+          <button class="boton" id="fl-duplicar" title="Duplicar">⧉</button>
+          <button class="boton peligro" id="fl-borrar" title="Borrar">🗑</button>
+        </div>
+        <div id="fl-despues" class="oculto caja-exito">
+          <b>✅ Flyer guardado</b>
+          <a id="fl-descargar" class="boton ancho" download>⬇ Descargar imagen</a>
+          <h3>Convertirlo en video</h3>
+          <label>Música <select id="fl-musica"></select></label>
+          <label>Duración (s) <input id="fl-duracion" type="number" value="6" min="2" max="30"></label>
+          <button id="fl-animar" class="boton ancho">🎞️ Animar para historias</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ================= ASISTENTE ================= -->
+  <section id="tab-asistente" class="tab">
+    <div class="asistente">
+      <div class="chat-caja">
+        <div class="chat-modo">
+          Quiero crear:
+          <label><input type="radio" name="modo" value="video" checked> 🎞️ un video</label>
+          <label><input type="radio" name="modo" value="flyer"> 🖼️ un flyer</label>
+        </div>
+        <div id="chat" class="chat">
+          <div class="msg claude">¡Hola! Soy Claude 👋 Cuéntame qué quieres crear y lo armo con tu material. Por ejemplo: <i>“Un reel de 20 segundos con mis clips de la playa, música alegre y el título VERANO 2026”</i> o <i>“Un flyer para una fiesta el sábado 12 a las 22 h en Club Luna, entrada $5000”</i>.</div>
+        </div>
+        <form id="chat-form" class="chat-form">
+          <textarea id="chat-texto" rows="2" placeholder="Escribe aquí lo que quieres…"></textarea>
+          <button class="boton primario" id="chat-enviar">Enviar</button>
+        </form>
+      </div>
+      <aside class="panel ajustes">
+        <h3>Conectar con Claude</h3>
+        <div id="asis-estado"></div>
+        <details>
+          <summary>Opción A — Claude dentro de esta app</summary>
+          <p>Necesita internet y una clave de la API de Claude (se paga aparte, por uso).
+            Créala en <b>console.anthropic.com</b> → API Keys, y pégala aquí:</p>
+          <input id="asis-clave" type="password" placeholder="sk-ant-..." class="ancho">
+          <button id="asis-guardar" class="boton ancho">Guardar clave</button>
+          <p class="sutil">Se guarda sólo en tu computadora (archivo config.local.json).</p>
+        </details>
+        <details open>
+          <summary>Opción B — Claude en tu computadora (Claude Code)</summary>
+          <p>Abre la app <b>Claude</b> de escritorio → <b>Code</b> y elige la carpeta de Basetoque:</p>
+          <code id="asis-carpeta" class="ruta"></code>
+          <p>Ahí puedes pedirme cualquier cosa (<i>“haz un reel con lo que subí hoy”</i>). Yo veo tu material,
+            edito los videos y guardo los resultados y proyectos en esta misma carpeta:
+            aparecen solos en <b>Mis archivos</b>, <b>Crear video → Abrir</b> y <b>Flyers → Abrir</b>.</p>
+        </details>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<!-- Trabajos en curso -->
+<div id="trabajos" class="trabajos"></div>
+
+<!-- Ventana de vista previa / diálogos -->
+<div id="modal" class="modal oculto">
+  <div class="modal-caja">
+    <button class="modal-cerrar" id="modal-cerrar">✕</button>
+    <div id="modal-contenido"></div>
+  </div>
+</div>
+
+<script src="/web/app.js"></script>
+<script src="/web/flyer.js"></script>
+</body>
+</html>
